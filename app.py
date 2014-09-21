@@ -23,13 +23,15 @@ def address():
 	#Get STREET, CITY, STATE, ZIP, EMAIL, PHONE number, FIRSTNAME, LASTNAME; send onward
 	return render_template('address.html')
 
-@app.route('/restaurants')
+@app.route('/restaurants', methods = ['POST'])
 def list():
 	#Use ADDRESS to send ordrin request to get list of all restaurants that deliver to that addr
-	street_address = request.args['street']
-	city = request.args['city']
-	state = request.args['state']
-	zipcode = request.args['zip']
+	print("Before args")
+	street_address = request.form['street']
+	city = request.form['city']
+	state = request.form['state']
+	zipcode = request.form['zip']
+	print(city)
 	
 	restaurants = ordrin_api.delivery_list('ASAP', street_address, city, zipcode)
 
