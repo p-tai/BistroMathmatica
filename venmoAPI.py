@@ -23,7 +23,7 @@ def getVenmoPostURL(token, email, items, total, surcharge):
 	amount required 	The amount you want to pay. To create a charge, use a negative amount.
 	audience 	The sharing setting for this payment. Possible values are 'public', 'friends' or 'private'.
 	"""
-	#baseURL = "https://api.venmo.com/v1/payment"
+	#baseURL = "https://api.venmo.com/v1/payments?"
 	baseURL = "https://sandbox-api.venmo.com/v1/payments?"
 	params = {}
 	#needs an access token of the user
