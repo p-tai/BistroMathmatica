@@ -1,63 +1,68 @@
 import urllib
 import json
 
-"""
-getVenmoPostURL - 
-Returns the POST request URL to charge another user
-token: access token for the user
-email: email of the user being charged
-items: list of tuples containing the ("item name", cost)
-total: total cost of the order BEFORE tax/tip/delivery
-surcharge: tax/tip/delivery fees (summed)
-"""
-def getVenmoPostURL(token, email, items, total, surcharge):
-	"""
-	Make a Payment/Charge
-	POST /payments
-	Pay or a charge an email, phone number or user.
-	Permissions: make_payments, access_balance (optional)
-	Parameters
-	access_token required 	An authorized user's access token.
-	phone, email or user_id required 	Provide a valid US phone, email or Venmo User ID.
-	note required 	A message to accompany the payment.
-	amount required 	The amount you want to pay. To create a charge, use a negative amount.
-	audience 	The sharing setting for this payment. Possible values are 'public', 'friends' or 'private'.
-	"""
+class AccountOwner:
 	#baseURL = "https://api.venmo.com/v1/payments?"
 	baseURL = "https://sandbox-api.venmo.com/v1/payments?"
-	params = {}
-	#needs an access token of the user
-	params["access_token"] = token
-	params["email"] = email
-	note = ""
-	subtotal = 0.0;
 	
-	#Add up the cost of each item and append it to the note
-	for item in items:
-		note += item[0]
-		note += " "
-		note += "{:.2f}".format(item[1])
-		note += " + "
-		subtotal += item[1]
+	def __init__(self,token):
+		self.token = token
 	
-	#Calcuate a pro-rated cost of other fees (delivery,tax,tip)
-	note += "tax, tip, delivery "
-	proRatedSurcharge = subtotal/total *  surcharge
-	note += "{:.2f}".format(proRatedSurcharge)
-	note += " = "
-	subtotal+=proRatedSurcharge
-	note += "{:.2f}".format(subtotal)
-	params["note"] = note
-	#print note
-	
-	#Set the amount negative to charge
-	params["amount"] = "-" + "{:.2f}".format(subtotal)
-	
-	params["audience"] = "friends"
-	postURL = baseURL + urllib.urlencode(params)
-	
-	#print postURL
-	return postURL
+	"""
+	getVenmoPostURL - 
+	Returns the POST request URL to charge another user
+	email: email of the user being charged
+	items: list of tuples containing the ("item name", cost)
+	total: total cost of the order BEFORE tax/tip/delivery
+	surcharge: tax/tip/delivery fees (summed)
+	"""
+	def getVenmoPostURL(self, email, items, total, surcharge):
+		"""
+		Make a Payment/Charge
+		POST /payments
+		Pay or a charge an email, phone number or user.
+		Permissions: make_payments, access_balance (optional)
+		Parameters
+		access_token required 	An authorized user's access token.
+		phone, email or user_id required 	Provide a valid US phone, email or Venmo User ID.
+		note required 	A message to accompany the payment.
+		amount required 	The amount you want to pay. To create a charge, use a negative amount.
+		audience 	The sharing setting for this payment. Possible values are 'public', 'friends' or 'private'.
+		"""
+
+		params = {}
+		#needs an access token of the user
+		params["access_token"] = self.token
+		params["email"] = email
+		note = ""
+		subtotal = 0.0;
+		
+		#Add up the cost of each item and append it to the note
+		for item in items:
+			note += item[0]
+			note += "("
+			note += "{:.2f}".format(item[1])
+			note += ")+"
+			subtotal += item[1]
+		
+		#Calcuate a pro-rated cost of other fees (delivery,tax,tip)
+		note += "fees("
+		proRatedSurcharge = subtotal/total *  surcharge
+		note += "{:.2f}".format(proRatedSurcharge)
+		note += ")="
+		subtotal+=proRatedSurcharge
+		note += "{:.2f}".format(subtotal)
+		params["note"] = note
+		#print note
+		
+		#Set the amount negative to charge
+		params["amount"] = "-" + "{:.2f}".format(subtotal)
+		
+		params["audience"] = "friends"
+		postURL = self.baseURL + urllib.urlencode(params)
+		
+		#print postURL
+		return postURL
 
 """
 getVenmoAccessTokenURL - 
@@ -81,7 +86,7 @@ def getVenmoAccessTokenURL():
 	#client id is assigned by Venmo
 	params["client_id"] = "1990"
 	
-	params["scope"] = "make_payments"
+	params["scope"] = "make_payments access_profile"
 	
 	accessURL = baseURL + urllib.urlencode(params)
 	
@@ -94,8 +99,12 @@ test functions, can be deleted once merged
 def main():
 	print getVenmoAccessTokenURL()
 	#after POSTing to Venmo to get the Access token
-	#@get /split/oauth you can get the access_token field from the URL and use the token to post payments
-	print getVenmoPostURL( "tempToken", "venmo@venmo.com",[("buffadilla",5.95), ("super-thick milk shake", 6.95)], 49.95, 10.00 )
+	
+	#@get /venmo_oauth you can get the "access_token" field and use the token to post payments
+	tempUser = AccountOwner("tempToken")
+	print tempUser.getVenmoPostURL( "venmo@venmo.com",[("buffadilla",5.95), ("super-thick milk shake", 6.95)], 49.95, 10.00 )
+	
+	
 	
 if __name__ == "__main__": 
 	main()
