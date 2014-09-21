@@ -33,13 +33,15 @@
 	<div class="row">
 		<div class="large-12 columns">
   			<div class="panel" id="main-panel">
-				<select name="restaurant-select">
-					<option value="default"> Please pick a restaurant </option>
-					{% for item in restaurants %}
-						<option value="{{ item.id }}"> {{ item.na }}</option> 
-					{% endfor %}
-				</select>
-				<div class="button tiny">Continue</div>
+				<form action="/menu" method="post">
+					<select name="restaurant-select">
+						<option value="default"> Please pick a restaurant </option>
+						{% for item in restaurants %}
+							<option value="{{ item.id }}"> {{ item.na }}</option> 
+						{% endfor %}
+					</select>
+					<input type="submit" class="button tiny"></input>
+				</form>
   			</div>
 		</div>
 	</div>

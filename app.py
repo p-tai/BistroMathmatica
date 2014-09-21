@@ -45,7 +45,7 @@ def list():
 
 #if menu is dumb, use eric song's text search, have user type in orders
 #test everything else first, hardcode a tray in
-@app.route('/menu')
+@app.route('/menu', methods = ['POST', 'GET'])
 def menu():
 	rid = 'hardcode'
 	tray = 'hardcode'
