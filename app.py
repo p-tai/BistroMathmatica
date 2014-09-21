@@ -26,12 +26,10 @@ def address():
 @app.route('/restaurants', methods = ['POST'])
 def list():
 	#Use ADDRESS to send ordrin request to get list of all restaurants that deliver to that addr
-	print("Before args")
 	street_address = request.form['street']
 	city = request.form['city']
 	state = request.form['state']
 	zipcode = request.form['zip']
-	print(city)
 	
 	restaurants = ordrin_api.delivery_list('ASAP', street_address, city, zipcode)
 
@@ -39,9 +37,7 @@ def list():
 	we_deliver = []
 	for r in restaurants:
 		#comment out for demo:
-		foods = ordrin_api.delivery_check('ASAP', str(r['id']), street_address, city, zipcode)
-		#comment out for demo:
-		if foods['delivery'] == 1:
+		if r['is_delivering'] == 1:
 			we_deliver.append(r)
 	#Display list (disp options: name, cuisine type, address, min order cost, delivery time)
 	#Get user choice back (Restaurant ID -> RID)
